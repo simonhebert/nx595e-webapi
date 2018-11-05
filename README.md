@@ -1,4 +1,4 @@
-# nx595e-web-api
+# nx595e-webapi
 Interlogix NetworX NX-595E REST Web API
 
 Compatible with Interlogix NetworX V2 security control panels (NX-4, NX-6, NX-8, NX-8E).
