@@ -82,29 +82,45 @@ metadata {
             }
 		}
 
-		standardTile("alarmTile", "device.alarmSystemStatus", width: 2, height: 2, decoration: "flat", canChangeIcon: true) {
-            state "off", label: "Off", action: "armAway", icon: "st.security.alarm.off", backgroundColor: "#ffffff", defaultState: true, nextState: "turningAway"
+		standardTile("armAwayTile", "device.alarmSystemStatus", width: 2, height: 2, decoration: "flat", canChangeIcon: true) {
+            state "off", label: "Away", action: "armAway", icon: "st.security.alarm.off", backgroundColor: "#ffffff", defaultState: true, nextState: "turningAway"
             state "away", label: "Away", action: "disarm", icon: "st.security.alarm.on", backgroundColor: "#bc2323", nextState: "turningOff"
             state "turningAway", label:"Turning away", icon:"st.security.alarm.on", backgroundColor:"#bc2323", nextState: "turningOff"
             state "turningOff", label:"Turning off", icon:"st.security.alarm.off", backgroundColor:"#ffffff", nextState: "turningAway"
         }
         
 		standardTile("armStayTile", "device.alarmSystemStatus", width: 2, height: 2, decoration: "flat", canChangeIcon: true) {
-            state "off", label: "Off", action: "armStay", icon: "st.security.alarm.off", backgroundColor: "#ffffff", defaultState: true, nextState: "turningStay"
+            state "off", label: "Stay", action: "armStay", icon: "st.security.alarm.off", backgroundColor: "#ffffff", defaultState: true, nextState: "turningStay"
             state "stay", label: "Stay", action: "disarm", icon: "st.security.alarm.partial", backgroundColor: "#f1d801", nextState: "turningOff"
             state "turningStay", label:"Turning stay", icon:"st.security.alarm.partial", backgroundColor:"#f1d801", nextState: "turningOff"
             state "turningOff", label:"Turning off", icon:"st.security.alarm.off", backgroundColor:"#ffffff", nextState: "turningStay"
         }
 
-        valueTile("alarmSystemStatusTile", "device.isSystemReady", width: 2, height: 2, decoration: "flat") {
-            state("isSystemReady", label:'${currentValue}', backgroundColor: "#cccccc"/*,
+/*
+        valueTile("systemReadyTile", "device.isSystemReady", width: 2, height: 2, decoration: "flat") {
+            state("isSystemReady", label:'${currentValue}', backgroundColor: "#cccccc",
             	backgroundColors:[
                     [value: "true", color: "#00a0dc"],
                     [value: "false", color: "#ffffff"]
-                ]*/
+                ]
             )
         }
-               
+*/
+        standardTile("systemReadyTile", "device.isSystemReady", width: 2, height: 2, decoration: "flat") {
+            state("false", label:"System Ready", backgroundColor: "#cccccc", defaultState: true)
+            state("true", label:"System Ready", backgroundColor: "#44b621")
+        }
+        
+        standardTile("intrusionAlarmTile", "device.isIntrusionAlarm", width: 2, height: 2, decoration: "flat") {
+            state("false", label:"Intrusion Alarm", backgroundColor: "#cccccc", defaultState: true)
+            state("true", label:"Intrusion Alarm", backgroundColor: "#e86d13")
+        }
+
+        standardTile("fireAlarmTile", "device.isFireAlarm", width: 2, height: 2, decoration: "flat") {
+            state("false", label:"Fire Alarm", backgroundColor: "#cccccc", defaultState: true)
+            state("true", label:"Fire Alarm", backgroundColor: "#e86d13")
+        }
+       
         standardTile("chimeTile", "device.isChimeEnabled", width: 2, height: 2, decoration: "flat", canChangeIcon: true) {
             state "false", label: "Chime", action: "chimeOn", icon: "st.quirky.spotter.quirky-spotter-sound-off", backgroundColor: "#ffffff", defaultState: true, nextState: "turningOn"
             state "true", label: "Chime", action: "chimeOff", icon: "st.alarm.beep.beep", backgroundColor: "#00a0dc", nextState: "turningOff"
@@ -112,8 +128,23 @@ metadata {
             state "turningOff", label:"Turning off", icon:"st.quirky.spotter.quirky-spotter-sound-off", backgroundColor:"#ffffff", nextState: "turningOn"
         }
         
-        standardTile("refreshTile", "capability.refresh", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
-            state "default", label:"Refresh", action:"refresh.refresh", icon:"st.secondary.refresh"
+        standardTile("exitTimeDelayTile", "device.isExitTimeDelay", width: 2, height: 2, decoration: "flat") {
+            state("false", label:"Exit Time Delay", backgroundColor: "#cccccc", defaultState: true)
+            state("true", label:"Exit Time Delay", backgroundColor: "#00a0dc")
+        }
+        
+        standardTile("entryTimeDelayTile", "device.isEntryTimeDelay", width: 2, height: 2, decoration: "flat") {
+            state("false", label:"Entry Time Delay", backgroundColor: "#cccccc", defaultState: true)
+            state("true", label:"Entry Time Delay", backgroundColor: "#00a0dc")
+        }
+        
+        standardTile("zoneBypassEnabledTile", "device.isZoneBypassEnabled", width: 2, height: 2, decoration: "flat") {
+            state("false", label:"Zone Bypass", backgroundColor: "#cccccc", defaultState: true)
+            state("true", label:"Zone Bypass", backgroundColor: "#00a0dc")
+        }
+ 
+        standardTile("refreshTile", "device.refresh", width: 2, height: 2, decoration: "flat") {
+            state "refresh", label:"Refresh", action:"refresh", icon:"st.secondary.refresh"
         }
             
         // The "switchTile" will be main tile, displayed in the "Things" view
@@ -121,7 +152,7 @@ metadata {
 
         // the "switch" and "power" tiles will appear in the Device Details
         // view (order is left-to-right, top-to-bottom)
-        details(["alarmSystemTile", "alarmTile", "armStayTile", "alarmSystemStatusTile", "chimeTile", "refreshTile"])
+        details(["alarmSystemTile", "armAwayTile", "armStayTile", "systemReadyTile", "intrusionAlarmTile", "fireAlarmTile", "chimeTile", "exitTimeDelayTile", "entryTimeDelayTile", "zoneBypassEnabledTile", "refreshTile"])
 	}
 }
 
@@ -239,7 +270,7 @@ def refresh() {
     
     /*
     // To the parse() function get called, no callback function must be present, and the deviceNetworkId must be UPPERCASE and
-    // set to MAC address (without colons) or IP address:port (hex IP : 4 digits hex port) must be used (ex: C0A8020A:0253).
+    // set to MAC address (without colons) or IP address:port (HEX IP : 4 digits HEX port) must be used (ex: C0A8020A:0253).
     def action = new physicalgraph.device.HubAction([
         method: "GET",
         path: "/Alarm/Status",
