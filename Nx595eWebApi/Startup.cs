@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration.FileExtensions;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace Nx595eWebApi
 {
@@ -24,7 +26,16 @@ namespace Nx595eWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //var config = new AppSettings();
+            //Configuration.Bind(config);
+            //services.AddSingleton(config);
+
+            //services.AddSingleton(Configuration);
+
+            services.AddOptions(); // Setup options with DI
+            services.Configure<AppSettings>(Configuration); // Configure AppSettings using config
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,7 +45,7 @@ namespace Nx595eWebApi
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.UseMvc();
         }
     }

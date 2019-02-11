@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nx595eWebApi", "Nx595eWebApi\Nx595eWebApi.csproj", "{1F3DA5AE-3F70-4E8E-8D51-FDBB5F362756}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nx595eWebApi", "Nx595eWebApi\Nx595eWebApi.csproj", "{1F3DA5AE-3F70-4E8E-8D51-FDBB5F362756}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{97FE01E8-59DB-44BF-8A34-FE3E6558EEF6}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

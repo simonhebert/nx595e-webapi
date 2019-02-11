@@ -14,11 +14,20 @@ namespace Nx595eWebApi
     {
         public static void Main(string[] args)
         {
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
+
             CreateWebHostBuilder(args).Build().Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+               .CaptureStartupErrors(true)
+                //.UseUrls("http://*:595")
+                //.UseContentRoot(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location))
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    //config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
+                })
+               .UseStartup<Startup>();
     }
 }

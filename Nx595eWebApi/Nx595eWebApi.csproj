@@ -1,7 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <UserSecretsId>956d959c-b3b1-42e6-94ff-2f4f91d73a01</UserSecretsId>
+    <Authors>Simon Hebert</Authors>
+    <Copyright>Copyright 2018 Simon Hebert (shebert@cbti.net)</Copyright>
+    <PackageProjectUrl>https://github.com/simonhebert/nx595e-webapi</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/simonhebert/nx595e-webapi/tree/master/Nx595eWebApi</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,7 +15,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.1" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
