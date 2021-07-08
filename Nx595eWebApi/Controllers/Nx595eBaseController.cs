@@ -101,12 +101,16 @@ namespace Nx595eWebApi.Controllers
             {
                 var response = XDocument.Load(responseStream).Element("response");
 
+                // stat0 = away
+                // stat1 = stay
                 // stat2 = system ready
                 // stat3 = fire alarm
                 // stat4 intrusion alarm
                 // stat7 = exit time delay
                 // stat9 entry time delay
                 // stat10 = zone(s) with bypass enabled
+                // stat15 = chime enabled
+                // sysflt = system status message
                 alarmStatus.ArmType =
                     int.Parse(response.Element("stat0").Value) != 0 ? "away" :
                     int.Parse(response.Element("stat1").Value) != 0 ? "stay" :
