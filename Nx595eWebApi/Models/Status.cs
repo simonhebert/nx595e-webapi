@@ -1,4 +1,6 @@
-﻿namespace Nx595eWebApi.Models
+﻿using System.Collections.Generic;
+
+namespace Nx595eWebApi.Models
 {
     public class Status
     {
@@ -12,5 +14,6 @@
         public bool IsChimeEnabled { get; set; }
         public string SystemStatus { get; set; }
         public Zone[] Zones { get; set; }
+        public List­<Output> Outputs { get; set; }
     }
 }

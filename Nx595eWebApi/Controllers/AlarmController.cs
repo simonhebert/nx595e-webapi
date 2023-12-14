@@ -68,10 +68,10 @@ namespace Nx595eWebApi.Controllers
                     new Dictionary<string, string>
                     {
                         {"sess", sessionID},
-                        {"comm", "80"},
-                        {"data0", "2"},
-                        {"data1", "1"},
-                        {"data2", data2}
+                        {"comm", "80"}, // Always 80
+                        {"data0", "2"}, // Always 2
+                        {"data1", "1"}, // Area Number (Mask)
+                        {"data2", data2} // Command ID (Button)
                     }
                 );
 

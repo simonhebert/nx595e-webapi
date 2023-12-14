@@ -53,25 +53,8 @@ namespace Nx595eWebApi.Controllers
 
         protected async Task<JsonResult> JsonStatusResult(HttpClient client, string sessionID, HttpResponseMessage responseMessage = null)
         {
-            HttpResponseMessage statusResponse;
+            // Status
 
-            if (responseMessage == null)
-            {
-                var statusHttpContent = new FormUrlEncodedContent(
-                        new Dictionary<string, string>
-                        {
-                            {"sess", sessionID},
-                            {"arsel", "0"}
-                        }
-                    );
-
-                statusResponse = await client.PostAsync("/user/status.xml", statusHttpContent);
-                statusResponse.EnsureSuccessStatusCode();
-            }
-            else
-                statusResponse = responseMessage;
-
-            var alarmStatus = new Status();
             /*
             <response>
               <abank>0</abank>
@@ -94,8 +77,45 @@ namespace Nx595eWebApi.Controllers
               <stat15>0</stat15>
               <stat16>0</stat16>
               <sysflt>No System Faults</sysflt>
-             </response>
+            </response>
+
+            stat0 "Armed Away",
+            stat1 "Armed Stay",
+            stat2 "Ready",
+            stat3 "Fire Alarm",
+            stat4 "Burg Alarm",
+            stat5 "Panic Alarm",
+            stat6 "Medical Alarm",
+            stat7 "Exit Delay",
+            stat8 "Exit Delay 2",
+            stat9 "Entry Delay",
+            stat10 "Zone Bypass",
+            stat11 "Zone Trouble",
+            stat12 "Zone Tamper",
+            stat13 "Zone Low Battery",
+            stat14 "Zone Supervision",
+            stat15 "Chime Enabled"
             */
+
+            HttpResponseMessage statusResponse;
+
+            if (responseMessage == null)
+            {
+                var statusHttpContent = new FormUrlEncodedContent(
+                        new Dictionary<string, string>
+                        {
+                            {"sess", sessionID},
+                            {"arsel", "0"} // Area index 0 (first)
+                        }
+                    );
+
+                statusResponse = await client.PostAsync("/user/status.xml", statusHttpContent);
+                statusResponse.EnsureSuccessStatusCode();
+            }
+            else
+                statusResponse = responseMessage;
+
+            var alarmStatus = new Status();
 
             using (var responseStream = await statusResponse.Content.ReadAsStreamAsync())
             {
@@ -127,12 +147,7 @@ namespace Nx595eWebApi.Controllers
                 alarmStatus.SystemStatus = response.Element("sysflt").Value;
             }
 
-            var zoneHttpContent = new FormUrlEncodedContent(
-                    new Dictionary<string, string>
-                    {
-                        {"sess", sessionID}
-                    }
-                );
+            // Zones
 
             /*
             POST /user/zstate.xml
@@ -142,7 +157,21 @@ namespace Nx595eWebApi.Controllers
                 <zseq>1</zseq>
                 <zdat>16,0,0,0</zdat>
             </response>
+
+            POST /user/zones.htm
+            var zoneDisplay = new Array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+            var zoneNames = new Array("1%2Dxxx","2%2Dxxx","3%2Dxxx","4%2Dxxx","5%2Dxxx","6%2Dxxx","7%2Dxxx","8%2Dxxx","","","11%2Dxxx","12%2Dxxx","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21","%21");
+            var zoneSequence = new Array(105,0,0,54,0,23,0,0,1,0,0,8,0,0);
+            var zoneStatus = new Array(new Array(0,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0),new Array(49152,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0),new Array(0,0,0,0));
             */
+
+            var zoneHttpContent = new FormUrlEncodedContent(
+                    new Dictionary<string, string>
+                    {
+                        {"sess", sessionID}
+                    }
+                );
+
             var zoneResponse = await client.PostAsync("/user/zones.htm", zoneHttpContent);
             zoneResponse.EnsureSuccessStatusCode();
 
@@ -166,7 +195,7 @@ namespace Nx595eWebApi.Controllers
                         .Split('(', ')')[1]
                         .Split(',')
                         .Select(z => WebUtility.UrlDecode(z.Trim('"')))
-                        .Where(z => z != string.Empty && z != "!")
+                        .Where(z => /*z != string.Empty &&*/ z != "!")
                         .ToArray();
 
                     reader.ReadLine();
@@ -216,13 +245,9 @@ namespace Nx595eWebApi.Controllers
                             var st = zoneStatus[zoneDisplay[i]][byteindex];
 
                             if ((st & mask) != 0)
-                            {
                                 zoneString = zoneStates[zoneDisplay[i]];
-                            }
                             else if (zoneDisplay[i] == 0)
-                            {
                                 zoneString = "Ready";
-                            }
 
                             zoneDisplay[i]++;
                         }
@@ -230,15 +255,51 @@ namespace Nx595eWebApi.Controllers
                         alarmStatus.Zones[i] = new Zone
                         {
                             Index = i,
+                            Number = i + 1,
                             Name = zoneNames[i],
                             Status = zoneString,
                             IsBypassed = (zoneStatus[3][byteindex] & mask) != 0
                         };
                     }
-
-                    return new JsonResult(alarmStatus);
                 }
             }
+
+            // Outputs
+
+            // POST : /user/outstat.xml
+            // Request: Sess=
+            // Response (XML): 
+            /*
+                <response>
+                    <s1>1</s1>
+                    <s2>0</s2>
+                </response>
+            */
+            // Optional: /user/outputs.htm
+
+            var outputHttpContent = new FormUrlEncodedContent(
+                    new Dictionary<string, string>
+                    {
+                        {"sess", sessionID}
+                    }
+                );
+
+            HttpResponseMessage outputResponse = await client.PostAsync("/user/outstat.xml", outputHttpContent);
+            outputResponse.EnsureSuccessStatusCode();
+
+            using (var responseStream = await outputResponse.Content.ReadAsStreamAsync())
+            {
+                var response = XDocument.Load(responseStream).Element("response");
+
+                alarmStatus.Outputs = new List<Output>();
+
+                foreach (var element in response.Elements())
+                {
+                    alarmStatus.Outputs.Add(new Output() { Number = int.Parse(element.Name.LocalName.Substring(1)), Name = element.Name.LocalName, IsStateOn = int.Parse(element.Value) != 0 });
+                }
+            }
+
+            return new JsonResult(alarmStatus);
         }
     }
 }

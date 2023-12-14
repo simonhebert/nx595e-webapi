@@ -9,28 +9,35 @@ namespace Nx595eWebApi.Controllers
 {
     //[Route("api/[controller]")]
     //[ApiController]
-    public class ZoneController : Nx595eBaseController
+    public class OutputController : Nx595eBaseController
     {
-        //public ZoneController(AppSettings appSettings) :
-        //    base(appSettings)
-        public ZoneController(IOptions<AppSettings> optionsAccessor) :
+        public OutputController(IOptions<AppSettings> optionsAccessor) :
             base(optionsAccessor)
         { }
 
-        // POST: /Zone/Bypass/zoneIndex
+        // POST: /Output/On/outputNumber
         [HttpPost]
-        [Route("Bypass/{zoneIndex:int:min(0)}")]
-        public async Task<ActionResult> Bypass(int zoneIndex)
+        [Route("On/{outputNumber:int:min(1)}")]
+        public async Task<ActionResult> On(int outputNumber)
         {
-            return await Zonefunction(zoneIndex.ToString());
+            return await Output(outputNumber.ToString(), "1");
+        }
+
+        // POST: /Output/Off/outputNumber
+        [HttpPost]
+        [Route("Off/{outputNumber:int:min(1)}")]
+        public async Task<ActionResult> Off(int outputNumber)
+        {
+            return await Output(outputNumber.ToString(), "0");
         }
 
         /// <summary>
-        /// Zone Bypass (toggle enabled or disabled).
+        /// Output On/Off.
         /// </summary>
-        /// <param name="data0">Zone number starting at index zero (0)</param>
+        /// <param name="onum">Output number starting at index one (1)</param>
+        /// <param name="ostate">Output state: 0=Off / 1=On</param>
         /// <returns>Status of the system</returns>
-        private async Task<ActionResult> Zonefunction(string data0)
+        private async Task<ActionResult> Output(string onum, string ostate)
         {
             using (var client = new HttpClient())
             {
@@ -42,12 +49,12 @@ namespace Nx595eWebApi.Controllers
                     new Dictionary<string, string>
                     {
                         {"sess", sessionID},
-                        {"comm", "82"}, // Always 82
-                        {"data0", data0} // Zone Index
+                        {"onum", onum},
+                        {"ostate", ostate}
                     }
                 );
 
-                var response = await client.PostAsync("/user/zonefunction.cgi", httpContent);
+                var response = await client.PostAsync("/user/output.cgi", httpContent);
                 response.EnsureSuccessStatusCode();
 
                 return await JsonStatusResult(client, sessionID);
