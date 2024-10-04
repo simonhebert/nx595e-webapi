@@ -70,7 +70,7 @@ namespace Nx595eWebApi.Controllers
                         {"sess", sessionID},
                         {"comm", "80"}, // Always 80
                         {"data0", "2"}, // Always 2
-                        {"data1", "1"}, // Area Number (Mask)
+                        {"data1", "1"}, // Area Number (Mask) - Always 1 for now.
                         {"data2", data2} // Command ID (Button)
                     }
                 );

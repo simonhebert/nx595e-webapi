@@ -94,7 +94,8 @@ namespace Nx595eWebApi.Controllers
             stat12 "Zone Tamper",
             stat13 "Zone Low Battery",
             stat14 "Zone Supervision",
-            stat15 "Chime Enabled"
+            stat15 "Chime Enabled",
+            sysflt "System Status Message"
             */
 
             HttpResponseMessage statusResponse;
@@ -105,7 +106,7 @@ namespace Nx595eWebApi.Controllers
                         new Dictionary<string, string>
                         {
                             {"sess", sessionID},
-                            {"arsel", "0"} // Area index 0 (first)
+                            {"arsel", "0"} // Area index 0 (only the first supported for now)
                         }
                     );
 
@@ -125,10 +126,17 @@ namespace Nx595eWebApi.Controllers
                 // stat1 = stay
                 // stat2 = system ready
                 // stat3 = fire alarm
-                // stat4 intrusion alarm
+                // stat4 = intrusion alarm
+                // stat5 = panic alarm
+                // stat6 = medical alarm
                 // stat7 = exit time delay
-                // stat9 entry time delay
+                // stat8 = exit time delay 2
+                // stat9 = entry time delay
                 // stat10 = zone(s) with bypass enabled
+                // stat11 = zone(s) with trouble
+                // stat12 = zone(s) with tamper
+                // stat13 = zone(s) with low battery
+                // stat14 = zone(s) with supervision
                 // stat15 = chime enabled
                 // sysflt = system status message
                 alarmStatus.ArmType =
@@ -139,9 +147,16 @@ namespace Nx595eWebApi.Controllers
                 alarmStatus.IsSystemReady = int.Parse(response.Element("stat2").Value) != 0;
                 alarmStatus.IsFireAlarm = int.Parse(response.Element("stat3").Value) != 0;
                 alarmStatus.IsIntrusionAlarm = int.Parse(response.Element("stat4").Value) != 0;
+                alarmStatus.IsPanicAlarm = int.Parse(response.Element("stat5").Value) != 0;
+                alarmStatus.IsMedicalAlarm = int.Parse(response.Element("stat6").Value) != 0;
                 alarmStatus.IsExitTimeDelay = int.Parse(response.Element("stat7").Value) != 0;
+                alarmStatus.IsExitTimeDelay2 = int.Parse(response.Element("stat8").Value) != 0;
                 alarmStatus.IsEntryTimeDelay = int.Parse(response.Element("stat9").Value) != 0;
                 alarmStatus.IsZoneBypassEnabled = int.Parse(response.Element("stat10").Value) != 0;
+                alarmStatus.IsZoneTrouble = int.Parse(response.Element("stat11").Value) != 0;
+                alarmStatus.IsZoneTamper = int.Parse(response.Element("stat12").Value) != 0;
+                alarmStatus.IsZoneLowBattery = int.Parse(response.Element("stat13").Value) != 0;
+                alarmStatus.IsZoneSupervision = int.Parse(response.Element("stat14").Value) != 0;
                 alarmStatus.IsChimeEnabled = int.Parse(response.Element("stat15").Value) != 0;
 
                 alarmStatus.SystemStatus = response.Element("sysflt").Value;
@@ -201,8 +216,7 @@ namespace Nx595eWebApi.Controllers
                     reader.ReadLine();
 
                     // 14
-                    var zoneStatusLine = reader.ReadLine();
-                    var zoneStatus = zoneStatusLine
+                    var zoneStatus = reader.ReadLine()
                         .Replace("var zoneStatus = new Array(", string.Empty)
                         .Replace(");", string.Empty)
                         .Split(new[] { "new Array(" }, StringSplitOptions.RemoveEmptyEntries)
@@ -298,6 +312,12 @@ namespace Nx595eWebApi.Controllers
                     alarmStatus.Outputs.Add(new Output() { Number = int.Parse(element.Name.LocalName.Substring(1)), Name = element.Name.LocalName, IsStateOn = int.Parse(element.Value) != 0 });
                 }
             }
+
+            // We could get the actual output names from the outputs.htm page if we wanted. Not currently implemented.
+            // client.PostAsync("/user/outputs.htm")
+            // Line 15 and 16:
+            // var oname1 = decodeURIComponent(decode_utf8("..."));
+            // var oname2 = decodeURIComponent(decode_utf8(""));
 
             return new JsonResult(alarmStatus);
         }
