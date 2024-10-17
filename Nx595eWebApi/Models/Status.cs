@@ -4,7 +4,7 @@ namespace Nx595eWebApi.Models
 {
     public class Status
     {
-        public string ArmType { get; set; }
+        public string ArmType { get; set; } // off/away/stay
         public bool IsSystemReady { get; set; }
         public bool IsFireAlarm { get; set; }
         public bool IsIntrusionAlarm { get; set; }
